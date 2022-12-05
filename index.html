@@ -1,0 +1,639 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>React Redux Tutorial</title>
+
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/black.css">
+  <link rel="stylesheet" href="lib/css/zenburn.css">
+
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+  <style>
+    pre {
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>React With Redux</h2>
+        <p style="font-size:14px; margin-top: 20px; text-align: center">Presented by Abdul Hadi Kamran</p>
+      </section>
+      <section>
+        <h4>Quick Revision to React and Why React?</h4>
+        <p style="text-align: left;">
+          React is a JavaScript library for creating user interfaces by Facebook and Instagram. Many people choose to
+          think of React as the V in MVC.
+        </p>
+        <ul style="font-size: 25px;">
+          <li><b>Simple:</b> Simply express how your app should look at any given point in time</li>
+          <li><b>Declarative:</b> When the data changes, React conceptually hits the "refresh" button, and knows to only
+            update the changed parts.</li>
+          <li><b>Build Composable Components:</b> building reusable components</li>
+        </ul>
+      </section>
+      <section>
+        <h4>Environment Setup</h4>
+        <p style="text-align: left;">
+          We will need node js to speed up the development.
+          We need some of the babel plugins.
+        </p>
+        <div style="font-size: 15px; text-align: left">package.json</div>
+        <pre><code data-trim data-noescape>
+              {
+                "name": "application_name",
+                "version": "1.0.0",
+                "description": "application_description",
+                "main": "main.js",
+                "scripts": {
+                  "start": "webpack-dev-server --hot"
+                },
+                "author": "",
+                "license": "ISC",
+                "dependencies": {
+                  "babel-core": "^6.11.4",
+                  "babel-loader": "^6.2.4",
+                  "babel-preset-es2015": "^6.9.0",
+                  "babel-preset-react": "^6.11.1",
+                  "react": "^15.3.0",
+                  "react-dom": "^15.3.0",
+                  "webpack": "^1.13.1",
+                  "webpack-dev-server": "^1.14.1"
+                }
+              }
+          </code></pre>
+      </section>
+      <section>
+        <h4>Set Compiler, Server and Loaders</h4>
+        <p style="font-size: 25px; text-align: left;">We have to create one 'webpack.config.js' or do all it with NPM
+          file. The entry point of the application is 'main.js'. Output path is the path where the bundled app will be
+          served. Development server will run to 8080 port. We are setting babel loaders to search for js files and use
+          es2015 and react presets that we installed before.</p>
+        <div style="font-size: 15px; text-align: left">webpack.config.js</div>
+        <pre><code data-trim data-noescape>
+              var config = {
+   entry: './main.js',
+
+   output: {
+      path:'./',
+      filename: 'index.js',
+   },
+
+   devServer: {
+      inline: true,
+      port: 8080
+   },
+
+   module: {
+      loaders: [
+         {
+            test: /\.jsx?$/,
+            exclude: /node_modules/,
+            loader: 'babel',
+
+            query: {
+               presets: ['es2015', 'react']
+            }
+         }
+      ]
+   }
+}
+
+module.exports = config;
+          </code></pre>
+      </section>
+      <section>
+        <h4>Component</h4>
+        <p style="font-size: 25px; text-align: left;">
+          Instances of a React Component are created internally in React when rendering. UI components are the cohesive
+          units. UI description and UI logic are tightly coupled.Full power of Javascripts to express UI.
+        </p>
+        <pre>
+            <code data-trim data-noescape>
+var li1 = React.createElement('li', null, "First text");
+var li2 = React.createElement('li', null, "Second text");
+
+var ul = React.createElement('ul', { className: 'text-list' }, li1, li2);
+
+React.render(ul, document.getElementsById('app'));
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>JSX</h4>
+        <p style="font-size: 25px; text-align: left;">
+          React uses JSX for templating instead of regular JavaScript. It is not necessary to use it, but there are some
+          pros that comes with it.
+        </p>
+        <ul style="font-size: 25px; text-align: left;">
+          <li>JSX is faster because it performs optimization while compiling code to JavaScript, type-safe and most of
+            the errors caught during compilation.</li>
+          <li>JSX makes it easier and faster to write templates if you are familiar with HTML.</li>
+        </ul>
+      </section>
+      <section>
+        <h4>JSX</h4>
+        <pre>
+            <code data-trim data-noescape>
+              var List = React.createClass(({
+              render: function() {
+                return(
+                  &lt;ul className="text-list"&gt;
+                    &lt;li&gt;First text&lt;/li&gt;
+                    &lt;li&gt;Second text&lt;/li&gt;
+                  &lt;/ul&gt;
+                )}
+              }));
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>Creating Components</h4>
+        <ul style="font-size: 25px; text-align: left;">
+          <li>Create the component using React.createClass()</li>
+          <li>Implement the render function</li>
+          <li>return the UI description</li>
+        </ul>
+      </section>
+      <section>
+        <h4>Component Composition</h4>
+        <pre>
+            <code data-trim data-noescape>
+var App = React.createClass({
+  render: function() {
+    return(
+      &lt;div&gt;
+        &lt;Header /&gt;
+        &lt;UserList /&gt;
+        &lt;Footer /&gt;
+      &lt;/div&gt;
+    )
+  }
+});
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>Data Flow</h4>
+        Properties passed by the parent, are available to the child in 'this.props'
+        <pre>
+            <code>
+var App = React.createClass({
+  render: function() {
+    return(
+      &lt;div&gt;
+        &lt;Header data="My Header"/&gt;
+        &lt;UserList /&gt;
+        &lt;Footer /&gt;
+      &lt;/div&gt;
+    )
+  }
+});
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>Child Component</h4>
+        <pre>
+            <code>
+var Header = React.createClass({
+  render: function() {
+    return(
+      &lt;h4&gt;
+        {this.props.data}
+      &lt;/h4&gt;
+    )
+  }
+});
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>Data Flow</h4>
+        <p style="text-align: left; font-size: 25px;">From child to parent. We can pass the event handler as a property.
+        </p>
+        <pre>
+            <code>
+var App = React.createClass({
+  popUser: function(key) {
+    console.log("User to be poped"+ key);
+  },
+
+  render: function() {
+    return(
+      &lt;div&gt;
+        &lt;Header data="My Header"/&gt;
+        &lt;UserList popUser={this.popUser}/&gt;
+        &lt;Footer /&gt;
+      &lt;/div&gt;
+    )
+  }
+});
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>Child Component</h4>
+        <pre>
+            <code>
+var UserList = React.createClass({
+  showName: function(event) {
+    this.props.popUser(event.target.value);
+  },
+
+  render: function() {
+    return(
+      &lt;input type="text" onChange={this.showName} /&gt;
+    )
+  }
+});
+            </code>
+          </pre>
+      </section>
+      <section>
+        <h4>React Form</h4>
+        <p style="font-size: 28px; text-align: left;">
+          Form components such as input, textarea, and option. Components support a few props that are affected via user
+          interactions:
+        </p>
+        <ul style="font-size: 25px;">
+          <li>value, supported by input and textarea components.</li>
+          <li>checked, supported by input components of type checkbox or radio.</li>
+          <li>selected, supported by option components.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h4>Redux</h4>
+        <p style="font-size: 25px; text-align: left;">
+          Redux is a predictable state container for JavaScript apps. It helps you write applications that behave
+          consistently, run in different environments. On top of that, it provides a great developer experience.<br />
+
+          Add "redux": "^3.5.2" to your package.json.
+
+        </p>
+      </section>
+      <section>
+        <section>
+          <h4>Immutable JS</h4>
+          <p style="font-size: 25px; text-align: left;">
+            Immutable Javascript means that we're never going to change a value once it's been set on an object. We
+            simply always create new objects and copy their values over.
+          </p>
+          <pre><code data-trim data-noescape>
+              var a = { name: "Will", age: 32 }
+              a.name = "Fred"
+              a
+              >  { name: "Fred", age: 32 }
+
+              var a = { name: "Will", age: 32 }
+              b = a
+              b
+              > { name: "Will", age: 32 }
+              b.age = 35
+              b
+              > { name: "Will", age: 35 }
+              a
+              > { name: "Will", age: 35 }
+            </code></pre>
+        </section>
+
+        <section>
+          <h4>Immutable JS</h4>
+          <p style="font-size: 25px; text-align: left;">
+            You have to know how to code immutable js objects.
+          </p>
+          <pre><code data-trim data-noescape>
+              var a = { name: "Will", age: 32 }
+              a
+              >  { name: "Will", age: 32 }
+
+              var b = Object.assign({}, a, { age: 35 })
+              b
+              > { name: "Will", age: 35 }
+              a
+              > { name: "Will", age: 32 }
+
+              var a = [0, 1, 2]
+              var b = a.filter((val) => val != 2)
+              b
+              > [0, 1]
+              a
+              > [0, 1, 2]
+            </code>
+          </pre>
+        </section>
+      </section>
+
+      <section>
+        <p style="font-size: 25px; text-align: left;">
+          Redux is not based on React. Redux is an elegantly simple way to manage state for your applications. First we
+          have to create the store.
+        </p>
+        <pre>
+        <code data-trim data-noescape>
+            import { createStore } from "redux";
+
+            const reducer = function() {
+
+            }
+
+            const store = createStore(reducer, 0);
+
+            store.subscribe(() => {
+              console.log("store changed", store.getState())
+            })
+
+        </code>
+      </pre>
+      </section>
+      <section>
+        <pre>
+        <code data-trim data-noescape>
+            import { createStore } from "redux";
+
+            const reducer = function() {
+
+            }
+
+            const store = createStore(reducer, 0);
+
+            store.subscribe(() => {
+              console.log("store changed", store.getState())
+            })
+
+            store.dispatch({ type: "INC", payload: 1 });
+
+        </code>
+      </pre>
+        <pre>
+        <code data-trim data-noescape>
+          > store changed undefined
+        </code>
+      </pre>
+      </section>
+
+      <section>
+        <pre>
+        <code data-trim data-noescape>
+            import { createStore } from "redux";
+
+            const reducer = function(state, action) {
+              if(action.type == "INC") {
+                return state + 1;
+              }
+              return state;
+            }
+            const store = createStore(reducer, 0);
+
+            store.subscribe(() => {
+              console.log("store changed", store.getState())
+            })
+
+            store.dispatch({ type: "INC", payload: 1 });
+            store.dispatch({ type: "INC", payload: 1 });
+            store.dispatch({ type: "INC", payload: 1 });
+            store.dispatch({ type: "INC", payload: 2 });
+
+        </code>
+      </pre>
+        <pre>
+        <code data-trim data-noescape>
+            > store changed 1
+            > store changed 2
+            > store changed 3
+            > store changed 5
+        </code>
+      </pre>
+      </section>
+      <section>
+        <section>
+          <h4>Multiple Reducers</h4>
+          <p style="font-size: 25px; text-align:left;">
+            Once your store is in place, you'll want to set up multiple Redux reducers to act on parts of your data
+            store. Redux reducers are great in that they are only aware of part of your data, and the rest of the data
+            is neither reachable nor able to be mutated by your reducer.
+          </p>
+          <pre style="font-size: 12px">
+        <code data-trim data-noescape>
+            import { combineReducers, createStore } from "redux";
+            import userReducer from "./userReducer.js"
+            import tweetsReducer from "./tweetReducer.js"
+
+            const reducers = combineReducers({
+              user: userReducer,
+              tweets: tweetsReducer
+            })
+
+            const store = createStore(reducers, {
+              user: {
+                name: "Will",
+                age: 32
+              },
+              tweets: []
+            });
+
+            store.subscribe(() => {
+              console.log("store changed", store.getState())
+            })
+
+            store.dispatch({ type: "CHANGE_NAME", payload: "Fred" })
+            store.dispatch({ type: "CHANGE_AGE", payload: 35 })
+</code></pre>
+        </section>
+
+        <section>
+          <p style="text-align: center">userReducer </p>
+          <pre><code data-trim data-noescape>
+            const userReducer = (state={}, action) => {
+              switch(action.type) {
+                case "CHANGE_NAME": {
+                  state = {...state, name: action.payload }
+                  break;
+                }
+                case "CHANGE_AGE": {
+                  state = {...state, age: action.payload }
+                  break;
+                }
+              }
+
+              return state;
+            }
+
+            export default userReducer;
+        </code></pre>
+        </section>
+
+        <section>
+          <p style="text-align: center">tweetsReducer </p>
+          <pre><code data-trim data-noescape>
+            const tweetsReducer = (state=[], action) => {
+              return state
+            }
+
+            export default tweetsReducer
+        </code></pre>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h4>Redux Middleware</h4>
+          <p style="font-size: 25px; text-align:left">
+            Redux middleware is awesome, it allows you to keep the simplicity of Redux, yet extend it's functionality.
+            Adding global things like loggers, error handlers, etc are incredibly simple.
+          </p>
+          <img data-src="images/middleware/1.png" />
+        </section>
+        <section>
+          <img data-src="images/middleware/2.png" />
+        </section>
+        <section>
+          <p style="font-size:25px;text-align:left">Adding logger</p>
+          <img data-src="images/middleware/3.png" />
+        </section>
+        <section>
+          <img data-src="images/middleware/4.png" />
+        </section>
+        <section>
+          <p style="font-size:25px;text-align:left">Adding logger</p>
+          <img data-src="images/middleware/5.png" />
+        </section>
+        <section>
+          <img data-src="images/middleware/6.png" />
+        </section>
+        <section>
+          <img data-src="images/middleware/7.png" />
+        </section>
+        <section>
+          <img data-src="images/middleware/8.png" />
+        </section>
+
+      </section>
+      <section>
+        <section>
+          <h4>Redux Async Action</h4>
+          <p style="font-size: 25px; text-align:left">
+            When you call an asynchronous API, there are two crucial moments in time: the moment you start the call, and
+            the moment when you receive an answer (or a timeout).
+          </p>
+          <p style="font-size: 25px; text-align: left">
+            We can add <u><i>axios</i></u> client to our javascript library. It is a promise based HTTP client for the
+            browser and node.js. Add it to package.json
+          </p>
+          <pre><code data-noescape data-trim>
+"axios": "^0.12.0",
+
+        </code></pre>
+        </section>
+
+        <section>
+          <img data-src="images/async/1.png" />
+        </section>
+        <section>
+          <img data-src="images/async/2.png" />
+        </section>
+        <section>
+          <img data-src="images/async/3.png" />
+        </section>
+        <section>
+          <img data-src="images/async/4.png" />
+        </section>
+        <section>
+          <img data-src="images/async/5.png" />
+        </section>
+        <section>
+          <img data-src="images/async/6.png" />
+        </section>
+
+      </section>
+
+      <section>
+        <section>
+          <h>Connecting React and Redux</h3>
+            <p style="font-size: 25px; text-align: left">
+              React and Redux play together REALLY well. Here's how to connect your Redux store with a React.js
+              application. As you can see, using React + Redux makes your application very scalable.
+            </p>
+        </section>
+        <section>
+          <p style="font-size: 25px; text-align: left">
+            First we have to wrap our top label component with react redux provider. Then we have to inject our store in
+            our provider.
+          </p>
+
+          <img data-src="images/react_redux/1.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/2.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/3.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/4.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/5.png" />
+        </section>
+        <section>
+          <p style="font-size: 25px; text-align: left">
+            We will import connect version of react redux. Connect will render the lauoyt component and injects the
+            props into it.
+          </p>
+          <img data-src="images/react_redux/6.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/7.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/8.png" />
+        </section>
+        <section>
+          <img data-src="images/react_redux/9.png" />
+        </section>
+      </section>
+      <section>
+        <h4>References</h4>
+        <ul align="left" style="padding-top: 20px; font-size: 25px">
+          <li>https://facebook.github.io/react</li>
+          <li>http://www.tutorialspoint.com/reactjs</li>
+          <li>https://github.com/learncodeacademy</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Thank You!</h2>
+      </section>
+    </div>
+  </div>
+
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.js"></script>
+
+  <script>
+    Reveal.initialize({
+      history: true,
+      dependencies: [
+        { src: 'plugin/markdown/marked.js' },
+        { src: 'plugin/markdown/markdown.js' },
+        { src: 'plugin/notes/notes.js', async: true },
+        { src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } }
+      ]
+    });
+  </script>
+</body>
+
+</html>
